@@ -33,6 +33,7 @@ function haveAddRequest(fromUserId,toUserId){
 }
 
 function createAddRequest(fromUserId,toUserId){
+  mlog.log("调用createAddRequest“");
   assert.notEqual(toUserId,null);
   var fromUser=createUser(fromUserId);
   var toUser=createUser(toUserId);
