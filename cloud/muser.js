@@ -102,6 +102,7 @@ function findRandomAvatar(){
 }
 
 function beforeSaveUser(req,res){
+  mlog.log("fuck avoscloud") ;
   var user=req.object;
   if(user.get('avatar')==null){
     findRandomAvatar().then(function(avatar){
