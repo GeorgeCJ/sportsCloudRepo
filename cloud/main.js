@@ -31,6 +31,6 @@ AV.Cloud.define("qiniuUptoken",mqiniu.qiniuUptoken);
 AV.Cloud.define("tryCreateAddRequest",madd.tryCreateAddRequest);
 AV.Cloud.define("agreeAddRequest",madd.agreeAddRequest);
 AV.Cloud.define("saveChatGroup",mgroup.saveChatGroup);
-AV.Cloud.beforeSave("_User",muser.beforeSaveUser);
+// AV.Cloud.beforeSave("_User",muser.beforeSaveUser);
 AV.Cloud.define("sign",msign.sign);
 AV.Cloud.define("group_sign", msign.groupSign);

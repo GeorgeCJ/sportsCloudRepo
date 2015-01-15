@@ -124,6 +124,6 @@ exports.addFriendForBoth = addFriendForBoth;
 exports.removeFriendForBoth = removeFriendForBoth;
 exports.findFriends = findFriends;
 exports.findAllUsers=findAllUsers;
-exports.beforeSaveUser=beforeSaveUser;
+// exports.beforeSaveUser=beforeSaveUser;
 exports.findRandomAvatar=findRandomAvatar;
 
