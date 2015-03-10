@@ -5,8 +5,11 @@ var mutil = require('cloud/mutil');
 var mlog = require('cloud/mlog');
 var Avatar=AV.Object.extend('Avatar');
 
-function findUserById(userId) {
+function findUserById(userId,queryFn) {
   var q = new AV.Query('_User');
+  if(queryFn){
+    queryFn(q);
+  }
   return q.get(userId);
 }
 
@@ -18,6 +21,24 @@ function findUserByName(name) {
   return findUser(function (q) {
     q.equalTo('username', name);
   });
+}
+
+function findUsernameById(id){
+  var p=new AV.Promise();
+  findUserById(id).then(function(user){
+    p.resolve(user.get('username'));
+  },function(error){
+    console.log(error.message);
+    p.resolve();
+  });
+  return p;
+}
+
+function findUsers(userIds){
+  var q=new AV.Query('_User');
+  q.containedIn('objectId',userIds);
+  q.include('setting');
+  return q.find();
 }
 
 function findAllUsers(modifyQueryFn){
@@ -102,7 +123,6 @@ function findRandomAvatar(){
 }
 
 function beforeSaveUser(req,res){
-  mlog.log("fuck avoscloud") ;
   var user=req.object;
   if(user.get('avatar')==null){
     findRandomAvatar().then(function(avatar){
@@ -116,6 +136,23 @@ function beforeSaveUser(req,res){
   }
 }
 
+function handleRelationRequest(req, res, handleRelationFn) {
+  var params = req.params;
+  var fromUserId = params.fromUserId;
+  var toUserId = params.toUserId;
+  handleRelationFn(fromUserId, toUserId).then(function () {
+    res.success();
+  }, mutil.cloudErrorFn(res));
+}
+
+function handleRemoveFriend(req,res){
+  handleRelationRequest(req, res, removeFriendForBoth);
+}
+
+function handleAddFriend(req,res){
+  handleRelationRequest(req, res, addFriendForBoth);
+}
+
 exports.findUser = findUser;
 exports.findUserById = findUserById;
 exports.addFriend = addFriend;
@@ -124,6 +161,9 @@ exports.addFriendForBoth = addFriendForBoth;
 exports.removeFriendForBoth = removeFriendForBoth;
 exports.findFriends = findFriends;
 exports.findAllUsers=findAllUsers;
-// exports.beforeSaveUser=beforeSaveUser;
+exports.beforeSaveUser=beforeSaveUser;
 exports.findRandomAvatar=findRandomAvatar;
-
+exports.handleAddFriend=handleAddFriend;
+exports.handleRemoveFriend=handleRemoveFriend;
+exports.findUsernameById=findUsernameById;
+exports.findUsers=findUsers;

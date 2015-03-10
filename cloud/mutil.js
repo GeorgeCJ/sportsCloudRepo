@@ -126,12 +126,6 @@ function createdAtDurationQueryFn(startDate, endDate) {
   return durationQueryFn('createdAt', startDate, endDate);
 }
 
-function printProperties(a) {
-  for (var p in a) {
-    mlog.log(p + '=' + a[p]);
-  }
-}
-
 function encrypt(s) {
   var md5 = crypto.createHash('md5');
   md5.update(s);
@@ -157,6 +151,5 @@ exports.calDateBeforeDays = calDateBeforeDays;
 exports.updatedAtDurationQueryFn = updatedAtDurationQueryFn;
 exports.calDateFromDateByDays = calDateFromDateByDays;
 exports.createdAtDurationQueryFn = createdAtDurationQueryFn;
-exports.printProperties = printProperties;
 exports.encrypt = encrypt;
 exports.cloudErrorFn = cloudErrorFn;

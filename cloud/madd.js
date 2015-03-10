@@ -8,7 +8,7 @@ var muser=require('cloud/muser');
 var _=require('underscore');
 
 var statusWait= 0,statusDone=1;
-var AddRequest=AV.Object.extend('addFriendRequest');
+var AddRequest=AV.Object.extend('AddRequest');
 
 function createUser(id){
   return AV.Object.createWithoutData('_User',id);
@@ -33,7 +33,6 @@ function haveAddRequest(fromUserId,toUserId){
 }
 
 function createAddRequest(fromUserId,toUserId){
-  mlog.log("调用createAddRequest“");
   assert.notEqual(toUserId,null);
   var fromUser=createUser(fromUserId);
   var toUser=createUser(toUserId);
