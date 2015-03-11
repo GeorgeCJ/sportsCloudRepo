@@ -124,16 +124,17 @@ function findRandomAvatar(){
 
 function beforeSaveUser(req,res){
   var user=req.object;
-  if(user.get('avatar')==null){
-    findRandomAvatar().then(function(avatar){
-      var url=avatar.get('file').url();
-      mlog.log('getFile '+url);
-      user.set('avatar',avatar.get('file'));
-      res.success();
-    },mutil.cloudErrorFn(res));
-  }else{
-    res.success();
-  }
+  res.success() ;
+  // if(user.get('avatar')==null){
+  //   findRandomAvatar().then(function(avatar){
+  //     var url=avatar.get('file').url();
+  //     mlog.log('getFile '+url);
+  //     user.set('avatar',avatar.get('file'));
+  //     res.success();
+  //   },mutil.cloudErrorFn(res));
+  // }else{
+  //   res.success();
+  // }
 }
 
 function handleRelationRequest(req, res, handleRelationFn) {
