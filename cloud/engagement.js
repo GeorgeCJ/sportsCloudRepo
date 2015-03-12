@@ -74,7 +74,7 @@ function _getStrangers(req)
                    var sportType = parseInt(req.params.sportType);
                    var tempFromUserSportListArray = fromUser[0].get('sportList');
 
-                  console.log(tempFromUserSportListArray.toString + 'testLog2') ;                   
+                  console.log(tempFromUserSportListArray[0].sportType  + 'testLog2') ;                   
 
                    var tempFromUserSportLevel = 0;
 
