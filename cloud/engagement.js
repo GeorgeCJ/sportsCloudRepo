@@ -69,13 +69,13 @@ function _getStrangers(req)
                        return null;
                        //mutil.rejectFn(p);
                    }
-                   console.log(fromUser.objectId + 'testLog') ;
+                   console.log(fromUser[0].objectId + 'testLog') ;
 
                    var sportType = parseInt(req.params.sportType);
-                   var tempFromUserSportListArray = fromUser[0].get('sportList');
 
-                  console.log(tempFromUserSportListArray[0].sportType  + 'testLog2') ;                   
+                   console.log(sportType + 'testLog2');
 
+                   var tempFromUserSportListArray = fromUser[0].get('sportList');  
                    var tempFromUserSportLevel = 0;
 
                    for(var j = 0; j < tempFromUserSportListArray.length; j++)
