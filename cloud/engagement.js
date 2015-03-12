@@ -193,6 +193,9 @@ function engagementWithStrangers(req, res) {
 function _engagementWithStrangers(params)
 {
     var p=new AV.Promise();
+
+    console.log("enter function 'engagementWithStrangers' ") ;
+
     //var EngagementStranger = AV.Object.extend("EngagementStrangers");
     var tempEngagement  = AV.Object.new('EngagementStrangers');
     if(params.objectId == null)
