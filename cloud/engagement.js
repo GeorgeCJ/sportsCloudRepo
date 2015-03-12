@@ -3,18 +3,20 @@ var muser=require('cloud/muser');
 var mutil=require('cloud/mutil');
 
 /*===============================================
-  文件:
+   文件:
         engagement.js
    说明:
         本文件包含4个函数,分别是:
-        getStrangers:                                      获取陌生人列表
-        engagementWithFriends:                  邀请好友
+        getStrangers:                     获取陌生人列表
+        engagementWithFriends:            邀请好友
         answerEngagementWithFriends;      回应好友邀请
-        engagementWithStrangers;               邀请陌生人
+        engagementWithStrangers;          邀请陌生人
     版本:
-        v2.0
+        v2.1
     修改时间:
-        2015/03/09
+        2015/03/13
+	创建时间:
+	    2015/03/08
     作者:
         ZhuangYan
 =================================================*/
@@ -27,12 +29,12 @@ var mutil=require('cloud/mutil');
   Prototype
             Array getStranger(params);
   Input Params
-                fromId:                     string         必填,寻找发起人的objectId
-                sex:                            string        必填,男/女 寻找的性别
-                engagementType     number     邀请类型 1 实力型 2 交友型
-                sportType:                 number    必填,运动种类 1 乒乓球 2 网球 3 足球 4 跑步 5 健身 6 篮球 7 羽毛球
-                                                                     如果fromUser在sportList里边没有该sportType, 则视为0.
-                count:                        number    请求的陌生人数量
+                fromId:            string     必填,寻找发起人的objectId
+                sex:               string     必填,男/女 寻找的性别
+                engagementType:    number     邀请类型 1 实力型 2 交友型
+                sportType:         number     必填,运动种类 1 乒乓球 2 网球 3 足球 4 跑步 5 健身 6 篮球 7 羽毛球
+                                              如果fromUser在sportList里边没有该sportType, 则视为0.
+                count:             number     请求的陌生人数量
   Output Params
                 无
   Return Value
@@ -151,14 +153,14 @@ function _getStrangers(req)
             string engagementWithStrangers(params);
   Input Params
                 objectId:       string      可选,如缺少则新建,如有则更新
-                when:            string      可选, 格式为:"yyyy-mm-dd hh:mm"
+                when:           string      可选, 格式为:"yyyy-mm-dd hh:mm"
                 fromId:         string      必填,约伴邀请方
-                toId:              string      必填,被邀请方
-                status:           number  必填,-1为完成, 0为原始状态, 1及以上为双方约伴次数
-                sportType:    number  必填,运动种类 1 乒乓球 2 网球 3 足球 4 跑步 5 健身 6 篮球 7 羽毛球
-                stadium:        string      标准体育场的objectId, 与newStadium二者选其一, 二者都填只接受stadium字段. 二者可都不填.
-                newStadium: string      自定义体育馆, 如果没有stadium字段则接受此字段, 需要本字段请不要在参数中出现stadium字段(不是为空)
-                                                       有自定义体育馆的请求,将会将新体育馆以及fromId写入类NewStadium
+                toId:           string      必填,被邀请方
+                status:         number      必填,-1为完成, 0为原始状态, 1及以上为双方状态
+                sportType:      number      必填,运动种类 1 乒乓球 2 网球 3 足球 4 跑步 5 健身 6 篮球 7 羽毛球
+                stadium:        string      标准体育场的objectId, 与newstadium二者选其一, 二者都填只接受stadium字段. 二者可都不填.
+                newstadium:     string      自定义体育馆, 如果没有stadium字段则接受此字段, 需要本字段请不要在参数中出现stadium字段(不是为空)
+                                            有自定义体育馆的请求,将会将新体育馆以及fromId写入类NewStadium
   Output Params
                 无
   Return Value
@@ -166,7 +168,7 @@ function _getStrangers(req)
   测试用例:
                 更新操作:
                     {'objectId':'54fd94d2e4b0a9c25c985a4e','fromId':'54e6f747e4b00e64145abd89',
-                    'toId':'54e382e3e4b03118ec313b63','status':3,'sportType':2,'when':'2012-12-12 12:23:21','newStadium':'上海赛车场'}
+                    'toId':'54e382e3e4b03118ec313b63','status':3,'sportType':2,'when':'2012-12-12 12:23:21','newstadium':'上海赛车场'}
                 新建操作:
                     {'fromId':'54e6f747e4b00e64145abd89',
                     'toId':'54e382e3e4b03118ec313b63','status':3,'sportType':2}
@@ -236,18 +238,14 @@ function _engagementWithStrangers(params)
                            }
                            //console.log('when:'+tempDate.toString());
 
-                           //状态,-1为完成,不然每次加1最开始是0
+                           //状态,-1为完成
                            var tempStatus = parseInt(params.status);
-                           if(tempStatus != -1)
+                           if(tempStatus != null)
                            {
-                               tempEngagement.set("status", tempStatus+1);
-                           }
-                           else
-                           {
-                               tempEngagement.set("status", -1);
+                               tempEngagement.set("status", tempStatus);
                            }
 
-                           if(params.stadium == null && params.newStadium == null)
+                           if(params.stadium == null && params.newstadium == null)
                            {
                                 console.log('Both stadium is null.');
                                tempEngagement.fetchWhenSave(true);
@@ -273,7 +271,7 @@ function _engagementWithStrangers(params)
                                                   {
                                                       var tempStadium = results[0];
                                                       tempEngagement.set("stadium", tempStadium);
-                                                      tempEngagement.set("newStadium", "");//如果有stadium就把新场馆删掉
+                                                      tempEngagement.set("newstadium", "");//如果有stadium就把新场馆删掉
                                                       tempEngagement.fetchWhenSave(true);
                                                       tempEngagement.save(null,{
                                                                               success: function(tempEngagement){
@@ -295,20 +293,20 @@ function _engagementWithStrangers(params)
                                           });
                            }
                            //如果有新场馆,写到表新场馆中
-                           else if(params.newStadium != null)
+                           else if(params.newstadium != null)
                            {
                                var tempNewStadium = AV.Object.new('NewStadium');
                                var query2 = new AV.Query('NewStadium');
                                  //console.log("paramsID: " + params.objectId);
                                query2.equalTo("createrUserId", fromPeer);
-                               query2.equalTo("newStadium", params.newStadium);
+                               query2.equalTo("newstadium", params.newstadium);
                                query2.find({
                                                success:function(results){
                                                    if(results < 1)
                                                    {
-                                                       //只有在不出现的情况下才在newStadium中注册,避免重复注册
+                                                       //只有在不出现的情况下才在newstadium中注册,避免重复注册
                                                        tempNewStadium.set("createrUserId", fromPeer);
-                                                       tempNewStadium.set("newStadium", params.newStadium);
+                                                       tempNewStadium.set("newstadium", params.newstadium);
                                                        tempNewStadium.save(null,{
                                                                                success: function(tempNewStadium){
                                                                                    //console.log(tempEngagement.id);
@@ -322,7 +320,7 @@ function _engagementWithStrangers(params)
                                                    }
                                                }
                                            });
-                               tempEngagement.set("newStadium",  params.newStadium);
+                               tempEngagement.set("newstadium",  params.newstadium);
                                tempEngagement.set("stadium",  null);
                                tempEngagement.fetchWhenSave(true);
                                tempEngagement.save(null,{
@@ -356,20 +354,20 @@ function _engagementWithStrangers(params)
   Prototype
             Array engagementWithFriends(params);
   Input Params
-                groupId:       string         约伴消息将会发送给group中的所有用户
-                fromId:         string        必填,约伴邀请方
-                type:              number    必填,运动种类 1 乒乓球 2 网球 3 足球 4 跑步 5 健身 6 篮球 7 羽毛球
-                when:            string        必填, 格式为:"yyyy-mm-dd hh:mm"
-                stadium:        string        与newStadium二者必填其一, 二者都填只接受stadium字段.标准体育场的objectId
-                newStadium: string        自定义体育馆, 如果没有stadium字段则接受此字段, 需要本字段请不要在参数中出现stadium字段(不是为空)
+                groupId:      string        约伴消息将会发送给group中的所有用户
+                fromId:       string        必填,约伴邀请方
+                type:         number        必填,运动种类 1 乒乓球 2 网球 3 足球 4 跑步 5 健身 6 篮球 7 羽毛球
+                when:         string        必填, 格式为:"yyyy-mm-dd hh:mm"
+                stadium:      string        与newstadium二者必填其一, 二者都填只接受stadium字段.标准体育场的objectId
+                newstadium:   string        自定义体育馆, 如果没有stadium字段则接受此字段, 需要本字段请不要在参数中出现stadium字段(不是为空)
                                                          有自定义体育馆的请求,将会讲新体育馆以及fromId写入类NewStadium
   Output Params
                 无
   Return Value
                 EngagementFriend类objectId数组, 顺序按照GroupId中用户的顺序排列
    测试用例:
-                说明: stadium和newStadium字段二者留其一
-                {'groupId':'54fc8649e4b08f775337c290','fromId':'54e6f747e4b00e64145abd89','sportType':'2','when':'2012-12-12 12:23:21','stadium':'54ef556ae4b0f26042068c7b','newStadium':'房山滑雪场'}
+                说明: stadium和newstadium字段二者留其一
+                {'groupId':'54fc8649e4b08f775337c290','fromId':'54e6f747e4b00e64145abd89','sportType':'2','when':'2012-12-12 12:23:21','stadium':'54ef556ae4b0f26042068c7b','newstadium':'房山滑雪场'}
 
 =================================================*/
 function engagementWithFriends(req, res) {
@@ -472,7 +470,7 @@ function engagementWithFriendsHelp(params)
             tempEngagement.set("when", tempDate);
             //console.log('when:'+tempDate.toString());
 
-            if(params.stadium == null && params.newStadium == null)
+            if(params.stadium == null && params.newstadium == null)
             {
                 console.log('stadium == null');
                 mutil.rejectFn(p);
@@ -487,7 +485,7 @@ function engagementWithFriendsHelp(params)
                                    {
                                        var tempStadium = results[0];
                                        tempEngagement.set("stadium", tempStadium);
-                                       tempEngagement.set("newStadium", "");//如果有stadium就把新场馆删掉
+                                       tempEngagement.set("newstadium", "");//如果有stadium就把新场馆删掉
                                        tempEngagement.fetchWhenSave(true);
                                        tempEngagement.save(null,{
                                                                success: function(tempEngagement){
@@ -509,20 +507,20 @@ function engagementWithFriendsHelp(params)
                            });
             }
             //如果有新场馆,写到表新场馆中
-            else if(params.newStadium != null)
+            else if(params.newstadium != null)
             {
                                        var tempNewStadium = AV.Object.new('NewStadium');
                                        var query2 = new AV.Query('NewStadium');
                                          //console.log("paramsID: " + params.objectId);
                                        query2.equalTo("createrUserId", fromPeer);
-                                       query2.equalTo("newStadium", params.newStadium);
+                                       query2.equalTo("newstadium", params.newstadium);
                                        query2.find({
                                                        success:function(results){
                                                            if(results < 1)
                                                            {
-                                                               //只有在不出现的情况下才在newStadium中注册,避免重复注册
+                                                               //只有在不出现的情况下才在newstadium中注册,避免重复注册
                                                                tempNewStadium.set("createrUserId", fromPeer);
-                                                               tempNewStadium.set("newStadium", params.newStadium);
+                                                               tempNewStadium.set("newstadium", params.newstadium);
                                                                tempNewStadium.save(null,{
                                                                                        success: function(tempNewStadium){
                                                                                            //console.log(tempEngagement.id);
@@ -536,7 +534,7 @@ function engagementWithFriendsHelp(params)
                                                            }
                                                        }
                                                    });
-                                       tempEngagement.set("newStadium",  params.newStadium);
+                                       tempEngagement.set("newstadium",  params.newstadium);
                                        tempEngagement.set("stadium",  null);
                                        tempEngagement.fetchWhenSave(true);
                                        tempEngagement.save(null,{
@@ -569,7 +567,7 @@ function engagementWithFriendsHelp(params)
             objectId answerEngagementWithFriends(params);
   Input Params
                 objectId:       string          EngagementWithFriends类的objectId
-                answer:         number      邀请的回应 -1拒绝 1同意
+                answer:         number          邀请的回应 -1拒绝 1同意
   Output Params
                 无
   Return Value
