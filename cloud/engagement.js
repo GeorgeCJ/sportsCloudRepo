@@ -95,7 +95,7 @@ function _getStrangers(req)
                                        var returnUserIdArrayCount = 0;
                                        for(var i = 0; i < strangers.length; i++)
                                        {
-                                           var tempSportListArray = strangers[i].get('sportList');
+                                           var tempSportListArray = strangers[i].get('sP_sportList');
                                            var tempSportLevel = 0;
                                            for(var j = 0; j < tempSportListArray.length; j++)
                                            {
