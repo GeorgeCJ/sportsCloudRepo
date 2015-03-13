@@ -12,7 +12,7 @@ var mutil=require('cloud/mutil');
         answerEngagementWithFriends;      回应好友邀请
         engagementWithStrangers;          邀请陌生人
     版本:
-        v2.1
+        v2.2
     修改时间:
         2015/03/13
 	创建时间:
@@ -69,15 +69,9 @@ function _getStrangers(req)
                        return null;
                        //mutil.rejectFn(p);
                    }
-                   console.log(fromUser[0].objectId + 'testLog') ;
-
                    var sportType = parseInt(req.params.sportType);
-
-                   console.log(sportType + 'testLog2');
-
-                   var tempFromUserSportListArray = fromUser[0].get('sportList');  
+                   var tempFromUserSportListArray = fromUser[0].get('sP_sportList');
                    var tempFromUserSportLevel = 0;
-
                    for(var j = 0; j < tempFromUserSportListArray.length; j++)
                    {
                        //console.log(tempFromUserSportListArray[j].sportType);
@@ -91,10 +85,10 @@ function _getStrangers(req)
                    //console.log(req.params.fromId);
                    var query2 = new AV.Query('_User');
                    //console.log(sportType);
-                   query2.equalTo('school',fromUser.school);
-                   query2.equalTo('sex',req.params.sex);
+                   query2.equalTo('sP_school',fromUser.school);
+                   query2.equalTo('sP_sex',req.params.sex);
                    query2.notEqualTo('objectId',req.params.fromId);
-                   query2.containedIn('sportList', [{"sportType":sportType,"sportLevel":1},{"sportType":sportType,"sportLevel":2},{"sportType":sportType,"sportLevel":3}]);
+                   query2.containedIn('sP_sportList', [{"sportType":sportType,"sportLevel":1},{"sportType":sportType,"sportLevel":2},{"sportType":sportType,"sportLevel":3}]);
                    query2.ascending('updatedAt'); //通过更新时间排序
                    query2.find({
                                    success:function(strangers){
@@ -193,9 +187,6 @@ function engagementWithStrangers(req, res) {
 function _engagementWithStrangers(params)
 {
     var p=new AV.Promise();
-
-    console.log("enter function 'engagementWithStrangers' ") ;
-
     //var EngagementStranger = AV.Object.extend("EngagementStrangers");
     var tempEngagement  = AV.Object.new('EngagementStrangers');
     if(params.objectId == null)
