@@ -12,9 +12,11 @@ var mutil=require('cloud/mutil');
         answerEngagementWithFriends;      回应好友邀请
         engagementWithStrangers;          邀请陌生人
     版本:
-        v2.2
+        v2.3
     修改时间:
-        2015/03/13
+        2015/03/09 增加获得陌生人列表,修改好友邀请的罗辑
+        2015/03/13 修复BUG
+        2015/03/18 user增加sP_campus字段
 	创建时间:
 	    2015/03/08
     作者:
@@ -40,7 +42,7 @@ var mutil=require('cloud/mutil');
   Return Value
                 _User类的objectId数组
   测试用例:
-                {'fromId':'54e6f747e4b00e64145abd89','sportType':5,'sex':'男','count':3,'engagementType':2}
+                 {'fromId':'5500766be4b00aa930032fd0','sportType':6,'sex':'男','count':3,'engagementType':2}
 
 =================================================*/
 
@@ -63,7 +65,6 @@ function _getStrangers(req)
     query.find({success:function(fromUser){
                    if(fromUser.length < 1)
                    {
-                       //[{"sportType":5},{"sportLevel":1},{"sportType":6,"sprotLevel":1},{"sprotType":4,"sportLevel":3}]
                        //[{"sportType":5,"sportLevel":2},{"sportType":2,"sportLevel":1},{"sportType":4,"sportLevel":3}]
                        console.log('Can\'t find user.');
                        return null;
@@ -85,7 +86,7 @@ function _getStrangers(req)
                    //console.log(req.params.fromId);
                    var query2 = new AV.Query('_User');
                    //console.log(sportType);
-                   query2.equalTo('sP_school',fromUser.school);
+                   query2.equalTo('sP_campus',fromUser.sP_campus);
                    query2.equalTo('sP_sex',req.params.sex);
                    query2.notEqualTo('objectId',req.params.fromId);
                    query2.containedIn('sP_sportList', [{"sportType":sportType,"sportLevel":1},{"sportType":sportType,"sportLevel":2},{"sportType":sportType,"sportLevel":3}]);
@@ -156,7 +157,8 @@ function _getStrangers(req)
                 when:           string      可选, 格式为:"yyyy-mm-dd hh:mm"
                 fromId:         string      必填,约伴邀请方
                 toId:           string      必填,被邀请方
-                status:         number      必填,-1为完成, 0为原始状态, 1及以上为双方状态
+                status:         number      必填,-2为完成,-1拒绝, 0为未回应, 1创建(枚举名为EngagementStatusReceivedUserHasInputInfo)
+                                                                 2修改(枚举名为EngagementStatusCreaterUserHasInputInfo)
                 sportType:      number      必填,运动种类 1 乒乓球 2 网球 3 足球 4 跑步 5 健身 6 篮球 7 羽毛球
                 stadium:        string      标准体育场的objectId, 与newstadium二者选其一, 二者都填只接受stadium字段. 二者可都不填.
                 newstadium:     string      自定义体育馆, 如果没有stadium字段则接受此字段, 需要本字段请不要在参数中出现stadium字段(不是为空)
@@ -167,11 +169,11 @@ function _getStrangers(req)
                 Engagement类的objectId
   测试用例:
                 更新操作:
-                    {'objectId':'54fd94d2e4b0a9c25c985a4e','fromId':'54e6f747e4b00e64145abd89',
-                    'toId':'54e382e3e4b03118ec313b63','status':3,'sportType':2,'when':'2012-12-12 12:23:21','newstadium':'上海赛车场'}
+                 {'objectId':'55029419e4b0c815bb146e72','fromId':'5500766be4b00aa930032fd0',
+                    'toId':'55007a48e4b00aa930033f72','status':3,'sportType':2,'when':'2012-12-12 12:23:21','stadium':'55027647e4b0f13bc48c25a4'}
                 新建操作:
-                    {'fromId':'54e6f747e4b00e64145abd89',
-                    'toId':'54e382e3e4b03118ec313b63','status':3,'sportType':2}
+                    {'fromId':'5500766be4b00aa930032fd0',
+                    'toId':'55007a48e4b00aa930033f72','status':3,'sportType':2}
 
 =================================================*/
 function engagementWithStrangers(req, res) {
@@ -367,7 +369,7 @@ function _engagementWithStrangers(params)
                 EngagementFriend类objectId数组, 顺序按照GroupId中用户的顺序排列
    测试用例:
                 说明: stadium和newstadium字段二者留其一
-                {'groupId':'54fc8649e4b08f775337c290','fromId':'54e6f747e4b00e64145abd89','sportType':'2','when':'2012-12-12 12:23:21','stadium':'54ef556ae4b0f26042068c7b','newstadium':'房山滑雪场'}
+                {'groupId':'5508e7eae4b0c760b3b93e58','fromId':'55007a48e4b00aa930033f72','sportType':'2','when':'2012-12-12 12:23:21','stadium':'55027647e4b0f13bc48c259b','newstadium':'房山滑雪场'}
 
 =================================================*/
 function engagementWithFriends(req, res) {
@@ -390,8 +392,8 @@ function _engagementWithFriends(params) {
         muser.findUserById(params.fromId).then(function(fromUser){
                 var returnObjectIdArrayCount = 0;
                 var returnObjectIdArray = new Array();
-                var query = new AV.Query('AVOSRealtimeGroups');
                 console.log("groupId: " + params.groupId);
+                var query = new AV.Query('AVOSRealtimeGroups');
                 query.equalTo("objectId", params.groupId);
                 query.find({success:function(results){
                     if(results.length > 0)
@@ -407,6 +409,7 @@ function _engagementWithFriends(params) {
                                 tempUserArrary.splice(tempIndex,1); //把自身删掉
                             }
                         }
+                        //console.log(tempUserArrary.length);
                         var tempReturnArray = new Array();
                         for(var i = 0; i < tempUserArrary.length;i++)
                         {
@@ -439,6 +442,7 @@ function engagementWithFriendsHelp(params)
     var fromPeerId = params.fromId;
     var toPeerId = params.toId;
     muser.findUsers([fromPeerId,toPeerId]).then(function(users){
+        //console.log("userLength:"+users.length);
         if(users.length==2)
         {
             var fromPeer;
@@ -573,7 +577,7 @@ function engagementWithFriendsHelp(params)
   Return Value
                 更新的objectId
    测试用例:
-                {'objectId':'54fdabbde4b0ec65c955d236','answer':'-1'}
+                {'objectId':'5508ec88e4b0c760b3b96915','answer':'-1'}
 =================================================*/
 function answerEngagementWithFriends(req, res) {
     _answerEngagementWithFriends(req.params).then(function(result){
