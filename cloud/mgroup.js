@@ -34,7 +34,7 @@ function saveChatGroup(req,res){
   var ownerId=req.params.ownerId;
   var name=req.params.name;
   _saveChatGroup(groupId,ownerId,name).then(function(results){
-      mlog.log('id='+ results);
+      //mlog.log('id='+ results);
     res.success(results);
   },mutil.cloudErrorFn(res));
 }
