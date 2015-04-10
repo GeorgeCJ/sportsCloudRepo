@@ -1,5 +1,6 @@
 /**
  * Created by lzw on 14/11/5.
+ * Update by Zy on 15/4/10.  Return groupId
  */
 var muser=require('cloud/muser');
 var mutil=require('cloud/mutil');
@@ -22,7 +23,7 @@ function _saveChatGroup(groupId,ownerId,groupName){
     acl.setWriteAccess(user,true);
     group.setACL(acl);
     group.save().then(function(){
-      p.resolve();
+      p.resolve(groupId);
     },mutil.rejectFn(p));
   },mutil.rejectFn(p));
   return p;
@@ -32,8 +33,9 @@ function saveChatGroup(req,res){
   var groupId=req.params.groupId;
   var ownerId=req.params.ownerId;
   var name=req.params.name;
-  _saveChatGroup(groupId,ownerId,name).then(function(){
-    res.success();
+  _saveChatGroup(groupId,ownerId,name).then(function(results){
+      mlog.log('id='+ results);
+    res.success(results);
   },mutil.cloudErrorFn(res));
 }
 
